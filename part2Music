@@ -1,0 +1,155 @@
+-- Drop the existing database if it exists
+DROP DATABASE IF EXISTS music;
+
+-- Create a new database
+CREATE DATABASE music;
+
+-- Connect to the new database
+\c music;
+
+-- Create the albums table
+CREATE TABLE albums (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  release_date DATE NOT NULL
+);
+
+-- Create the artists table
+CREATE TABLE artists (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+-- Create the producers table
+CREATE TABLE producers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+-- Create the songs table with references to artists and producers
+CREATE TABLE songs (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  duration_in_seconds INTEGER NOT NULL,
+  album_id INT NOT NULL,
+  release_date DATE NOT NULL,
+  FOREIGN KEY (album_id) REFERENCES albums(id)
+);
+
+-- Create a many-to-many relationship table for artists
+CREATE TABLE song_artists (
+  song_id INT NOT NULL,
+  artist_id INT NOT NULL,
+  PRIMARY KEY (song_id, artist_id),
+  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE,
+  FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+);
+
+-- Create a many-to-many relationship table for producers
+CREATE TABLE song_producers (
+  song_id INT NOT NULL,
+  producer_id INT NOT NULL,
+  PRIMARY KEY (song_id, producer_id),
+  FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE,
+  FOREIGN KEY (producer_id) REFERENCES producers(id) ON DELETE CASCADE
+);
+
+-- Insert data into the albums table
+INSERT INTO albums (name, release_date)
+VALUES
+  ('Middle of Nowhere', '1997-04-15'),
+  ('A Night at the Opera', '1975-10-31'),
+  ('Daydream', '1995-11-14'),
+  ('A Star Is Born', '2018-09-27'),
+  ('Silver Side Up', '2001-08-21'),
+  ('The Blueprint 3', '2009-10-20'),
+  ('Prism', '2013-12-17'),
+  ('Hands All Over', '2011-06-21'),
+  ('Let Go', '2002-05-14'),
+  ('The Writing''s on the Wall', '1999-11-07');
+
+-- Insert data into the artists table
+INSERT INTO artists (name)
+VALUES
+  ('Hanson'),
+  ('Queen'),
+  ('Mariah Carey'),
+  ('Boyz II Men'),
+  ('Lady Gaga'),
+  ('Bradley Cooper'),
+  ('Nickelback'),
+  ('Jay Z'),
+  ('Alicia Keys'),
+  ('Katy Perry'),
+  ('Juicy J'),
+  ('Maroon 5'),
+  ('Christina Aguilera'),
+  ('Avril Lavigne'),
+  ('Destiny''s Child');
+
+-- Insert data into the producers table
+INSERT INTO producers (name)
+VALUES
+  ('Dust Brothers'),
+  ('Stephen Lironi'),
+  ('Roy Thomas Baker'),
+  ('Walter Afanasieff'),
+  ('Benjamin Rice'),
+  ('Rick Parashar'),
+  ('Al Shux'),
+  ('Max Martin'),
+  ('Cirkut'),
+  ('Shellback'),
+  ('Benny Blanco'),
+  ('The Matrix'),
+  ('Darkchild');
+
+-- Insert data into the songs table
+INSERT INTO songs (title, duration_in_seconds, album_id, release_date)
+VALUES
+  ('MMMBop', 238, 1, '1997-04-15'),
+  ('Bohemian Rhapsody', 355, 2, '1975-10-31'),
+  ('One Sweet Day', 282, 3, '1995-11-14'),
+  ('Shallow', 216, 4, '2018-09-27'),
+  ('How You Remind Me', 223, 5, '2001-08-21'),
+  ('New York State of Mind', 276, 6, '2009-10-20'),
+  ('Dark Horse', 215, 7, '2013-12-17'),
+  ('Moves Like Jagger', 201, 8, '2011-06-21'),
+  ('Complicated', 244, 9, '2002-05-14'),
+  ('Say My Name', 240, 10, '1999-11-07');
+
+-- Insert data into the song_artists table
+INSERT INTO song_artists (song_id, artist_id)
+VALUES
+  (1, 1),  -- MMMBop, Hanson
+  (2, 2),  -- Bohemian Rhapsody, Queen
+  (3, 3),  -- One Sweet Day, Mariah Carey
+  (3, 4),  -- One Sweet Day, Boyz II Men
+  (4, 5),  -- Shallow, Lady Gaga
+  (4, 6),  -- Shallow, Bradley Cooper
+  (5, 7),  -- How You Remind Me, Nickelback
+  (6, 8),  -- New York State of Mind, Jay Z
+  (6, 9),  -- New York State of Mind, Alicia Keys
+  (7, 10), -- Dark Horse, Katy Perry
+  (7, 11), -- Dark Horse, Juicy J
+  (8, 12), -- Moves Like Jagger, Maroon 5
+  (8, 13), -- Moves Like Jagger, Christina Aguilera
+  (9, 14), -- Complicated, Avril Lavigne
+  (10, 15); -- Say My Name, Destiny's Child
+
+-- Insert data into the song_producers table
+INSERT INTO song_producers (song_id, producer_id)
+VALUES
+  (1, 1),  -- MMMBop, Dust Brothers
+  (1, 2),  -- MMMBop, Stephen Lironi
+  (2, 3),  -- Bohemian Rhapsody, Roy Thomas Baker
+  (3, 4),  -- One Sweet Day, Walter Afanasieff
+  (4, 5),  -- Shallow, Benjamin Rice
+  (5, 6),  -- How You Remind Me, Rick Parashar
+  (6, 7),  -- New York State of Mind, Al Shux
+  (7, 8),  -- Dark Horse, Max Martin
+  (7, 9),  -- Dark Horse, Cirkut
+  (8, 10), -- Moves Like Jagger, Shellback
+  (8, 11), -- Moves Like Jagger, Benny Blanco
+  (9, 12), -- Complicated, The Matrix
+  (10, 13); -- Say My Name, Darkchild
