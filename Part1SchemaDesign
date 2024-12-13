@@ -1,0 +1,226 @@
+Part One: Medical Center
+
+Schema Design
+
+  Doctors: Stores doctor information (e.g., name, specialty).
+
+  Patients: Stores patient information (e.g., name, date of birth).
+
+  Visits: Tracks each patient visit, linking a patient to a doctor and any diagnoses.
+
+  Diseases: Stores a list of diseases.
+
+  Diagnoses: Links visits to diseases.
+
+Relationships
+
+  Doctors to Visits: One-to-Many (a doctor can have many visits).
+
+  Patients to Visits: One-to-Many (a patient can have many visits).
+
+  Visits to Diagnoses: One-to-Many (a visit can have multiple diagnoses).
+
+  Diseases to Diagnoses: One-to-Many (a disease can be diagnosed multiple times).
+
+DDL Statements
+
+CREATE TABLE Doctors (
+    DoctorID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Specialty VARCHAR(100)
+);
+
+CREATE TABLE Patients (
+    PatientID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    DateOfBirth DATE
+);
+
+CREATE TABLE Diseases (
+    DiseaseID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Visits (
+    VisitID SERIAL PRIMARY KEY,
+    PatientID INT REFERENCES Patients(PatientID),
+    DoctorID INT REFERENCES Doctors(DoctorID),
+    VisitDate DATE NOT NULL
+);
+
+CREATE TABLE Diagnoses (
+    DiagnosisID SERIAL PRIMARY KEY,
+    VisitID INT REFERENCES Visits(VisitID),
+    DiseaseID INT REFERENCES Diseases(DiseaseID)
+);
+
+Sample Data Insertion
+
+INSERT INTO Doctors (Name, Specialty) VALUES ('Dr. Smith', 'Cardiology');
+INSERT INTO Patients (Name, DateOfBirth) VALUES ('John Doe', '1980-05-15');
+INSERT INTO Diseases (Name) VALUES ('Hypertension');
+INSERT INTO Visits (PatientID, DoctorID, VisitDate) VALUES (1, 1, '2023-12-01');
+INSERT INTO Diagnoses (VisitID, DiseaseID) VALUES (1, 1);
+
+
+Part Two: Craigslist
+
+Schema Design
+
+  Regions: Stores region information.
+
+  Users: Stores user information and preferred region.
+
+  Posts: Stores post details, including title, text, user, and region.
+
+  Categories: Stores available categories.
+
+  PostCategories: Many-to-Many table linking posts and categories.
+
+Relationships
+
+  Regions to Users: One-to-Many (a region can have many users).
+
+  Users to Posts: One-to-Many (a user can create many posts).
+
+  Regions to Posts: One-to-Many (a region can have many posts).
+
+  Posts to Categories: Many-to-Many via PostCategories.
+
+DDL Statements
+
+
+CREATE TABLE Regions (
+    RegionID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Users (
+    UserID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    PreferredRegionID INT REFERENCES Regions(RegionID)
+);
+
+CREATE TABLE Posts (
+    PostID SERIAL PRIMARY KEY,
+    Title VARCHAR(200) NOT NULL,
+    Text TEXT,
+    UserID INT REFERENCES Users(UserID),
+    RegionID INT REFERENCES Regions(RegionID)
+);
+
+CREATE TABLE Categories (
+    CategoryID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE PostCategories (
+    PostID INT REFERENCES Posts(PostID),
+    CategoryID INT REFERENCES Categories(CategoryID),
+    PRIMARY KEY (PostID, CategoryID)
+);
+
+Sample Data Insertion
+
+INSERT INTO Regions (Name) VALUES ('San Francisco');
+INSERT INTO Users (Name, PreferredRegionID) VALUES ('Alice', 1);
+INSERT INTO Posts (Title, Text, UserID, RegionID) VALUES ('Selling bike', 'Great condition!', 1, 1);
+INSERT INTO Categories (Name) VALUES ('For Sale');
+INSERT INTO PostCategories (PostID, CategoryID) VALUES (1, 1);
+
+
+Part Three: Soccer League
+
+Schema Design
+
+  Teams: Stores team information.
+
+  Players: Stores player information and their team affiliation.
+
+  Games: Stores game details (e.g., teams, referees, date).
+
+  Goals: Tracks each goal scored in a game.
+
+  Referees: Stores referee information.
+
+  Seasons: Tracks start and end dates of each season.
+
+  Standings: Tracks team rankings in a season.
+
+Relationships
+
+  Seasons to Standings: One-to-Many (a season has many standings).
+
+  Teams to Players: One-to-Many (a team can have many players).
+
+  Games to Goals: One-to-Many (a game can have many goals).
+
+  Referees to Games: Many-to-Many.
+
+DDL Statements
+
+CREATE TABLE Teams (
+    TeamID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Players (
+    PlayerID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    TeamID INT REFERENCES Teams(TeamID)
+);
+
+CREATE TABLE Seasons (
+    SeasonID SERIAL PRIMARY KEY,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL
+);
+
+CREATE TABLE Games (
+    GameID SERIAL PRIMARY KEY,
+    HomeTeamID INT REFERENCES Teams(TeamID),
+    AwayTeamID INT REFERENCES Teams(TeamID),
+    GameDate DATE NOT NULL
+);
+
+CREATE TABLE Goals (
+    GoalID SERIAL PRIMARY KEY,
+    GameID INT REFERENCES Games(GameID),
+    PlayerID INT REFERENCES Players(PlayerID),
+    TimeScored TIME NOT NULL
+);
+
+CREATE TABLE Referees (
+    RefereeID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE GameReferees (
+    GameID INT REFERENCES Games(GameID),
+    RefereeID INT REFERENCES Referees(RefereeID),
+    PRIMARY KEY (GameID, RefereeID)
+);
+
+CREATE TABLE Standings (
+    StandingsID SERIAL PRIMARY KEY,
+    SeasonID INT REFERENCES Seasons(SeasonID),
+    TeamID INT REFERENCES Teams(TeamID),
+    Rank INT NOT NULL
+);
+
+Sample Data Insertion
+
+INSERT INTO Teams (Name) VALUES ('Team A'), ('Team B');
+INSERT INTO Players (Name, TeamID) VALUES ('Player 1', 1), ('Player 2', 2);
+INSERT INTO Seasons (StartDate, EndDate) VALUES ('2023-01-01', '2023-12-31');
+INSERT INTO Games (HomeTeamID, AwayTeamID, GameDate) VALUES (1, 2, '2023-06-15');
+INSERT INTO Goals (GameID, PlayerID, TimeScored) VALUES (1, 1, '00:15:30');
+INSERT INTO Referees (Name) VALUES ('Referee 1');
+INSERT INTO GameReferees (GameID, RefereeID) VALUES (1, 1);
+INSERT INTO Standings (SeasonID, TeamID, Rank) VALUES (1, 1, 1);
+
+
+
+
+
+
